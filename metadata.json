@@ -1,0 +1,11 @@
+{
+  "uuid": "always-on-top@sailormoonq",
+  "name": "Always On Top",
+  "description": "Toggle always-on-top for the focused window with Ctrl+Super+T, and outline pinned windows with a blue border.",
+  "shell-version": [
+    "42"
+  ],
+  "settings-schema": "org.gnome.shell.extensions.always-on-top",
+  "version": 1,
+  "url": "https://github.com/SailorMoonQ/always-on-top"
+}

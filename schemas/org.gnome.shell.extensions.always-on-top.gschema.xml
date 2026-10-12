@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.always-on-top" path="/org/gnome/shell/extensions/always-on-top/">
+    <key name="toggle-always-on-top" type="as">
+      <default><![CDATA[['<Control><Super>t']]]></default>
+      <summary>Toggle always-on-top for the focused window</summary>
+    </key>
+  </schema>
+</schemalist>
