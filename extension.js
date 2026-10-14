@@ -56,9 +56,14 @@ class Border {
                 this._scheduleCornerDetection();
             }),
         ];
-        this._actorVisibleId = this._actor.connect(
-            'notify::visible',
-            () => this._scheduleCornerDetection()
+        /* A window pinned before its first frame has no pixels to inspect
+         * yet, so its corners are detected again once that frame is drawn.
+         * The actor can already be destroyed when the window is unmanaged;
+         * connectObject() drops these handlers along with it. */
+        this._actor.connectObject(
+            'notify::visible', () => this._scheduleCornerDetection(),
+            'first-frame', () => this._scheduleCornerDetection(),
+            this
         );
         this._displaySignals = [
             global.display.connect('restacked', () => this._syncStacking()),
@@ -75,7 +80,7 @@ class Border {
             GLib.source_remove(this._cornerDetectionId);
 
         this._windowSignals.forEach(id => this._window.disconnect(id));
-        this._actor.disconnect(this._actorVisibleId);
+        this._actor.disconnectObject(this);
         this._displaySignals.forEach(id => global.display.disconnect(id));
         this._visibleBinding.unbind();
         this._widget.destroy();
@@ -127,6 +132,14 @@ class Border {
     /* Only a floating, visible window shows its real corner shape. */
     _detectCorners() {
         if (!this._isFloating() || !this._actor.visible)
+            return;
+
+        /* Mutter 42's get_image() dereferences the window texture without a
+         * NULL check and crashes the shell. The texture is missing until the
+         * window's first frame, and briefly while its pixmap is rebound after
+         * a resize or a decoration change. */
+        const texture = this._actor.get_texture();
+        if (!texture || !texture.get_texture())
             return;
 
         const frame = this._window.get_frame_rect();
